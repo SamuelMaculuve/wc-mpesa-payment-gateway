@@ -10,9 +10,19 @@ let app = new Vue({
     return_url: '#',
     disabled: false,
     error: null,
+    timerCount: 0,
+    statusCount: false,
+    terms: true,
+  },
+  computed: {
+    isDisabled: function(){
+      return !this.terms;
+    }
   },
   methods: {
     requestSyncPayment: function (info) {
+      this.statusCount = true 
+      this.timerCount = 60
       this.tooglePaymentButton();
       this.return_url = info.return_url;
       const params = new URLSearchParams();
@@ -39,5 +49,22 @@ let app = new Vue({
         clearInterval(this.timerChecker);
       }, TransactionTimeoutTime)
     }
-  }
+  },
+    watch: {
+    timerCount: {
+      handler(value) {
+        if (value > 0) {
+          setTimeout(() => {
+            this.timerCount--;
+            if(this.timerCount > 0){
+              this.terms = false
+            }else{
+              this.terms = true
+            }
+          }, 1000);
+        }
+      },
+      immediate: true, // This ensures the watcher is triggered upon creation
+    },
+  },
 })
